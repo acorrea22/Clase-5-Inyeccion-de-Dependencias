@@ -78,7 +78,7 @@ Si bien la estructura es correcta, ¿cómo están las responsabilidades a nivel 
  
  El problema reside en que ambas piezas de código tiene la responsabilidad de la instanciación de sus dependencias. Nuestras capas no deberían estar tan fuertemente acopladas y no deberíam ser tan dependientes entre sí. Si bien el acoplamiento es a nivel de interfaz (tenemos IBreedsBusinessLogic y IBreedsRepository), la tarea de creación/instanciación/"hacer el new" de los objetos debería ser asignada a alguien más. Nuestras capas no deberían preocuparse sobre la creación de sus dependencias.
 
-**¿Por qué? ¿Qué tiene esto de malo?**
+**¿Por qué? ¿Qué tiene esto de malo?**:-1:
 
 1. Si queremos **reemplazar** por ejemplo nuestro BreedsBusinessLogic **por una implementación diferente**, deberamos modificar nuestro controller. Si queremos reemplazar nuestro BreedsRepository por otro, tenemos que modificar nuestra clase BreedsBusinessLogic.
 
@@ -107,15 +107,26 @@ Esto lo haremos a partir de un parámetro en el constructor, o de un setter. Por
 Esto es fácil lograrlo usando interfaces o clases abstractas en C#.Siempre que una clase satisfaga la interfaz,voy a poder sustituirla e inyectarla.
 
 
-## Ventajas de ID:
+## Ventajas de ID
 
-Logramos resolver lo que antes habíamos descrito como desventajas o problemas.
+Logramos resolver lo que antes habíamos descrito como desventajas o problemas :grin: :thumbsup:.
 
 1. Código más limpio. El código es más fácil de leer y de usar.
 2. Nuestro software termina siendo más fácil de Testear. 
 3. Es más fácil de modificar. Nuestros módulos son flexibles a usar otras implementaciones. Desacoplamos nuestras capas.
 4. Permite NO Violar SRP. Permite que sea más fácil romper la funcionalidad coherente en cada interfaz. Ahora nuestra lógica de creación de objetos no va a estar relacionada a la lógica de cada módulo. Cada módulo solo usa sus dependencias, no se encarga de inicializarlas ni conocer cada una de forma particular.
 5. Permite NO Violar OCP. Por todo lo anterior, nuestro código es abierto a la extensión y cerrado a la modificación. El acoplamiento entre módulos o clases es  siempre a nivel de interfaz.
+
+## Problema de la construcción de dependencias: Unity como contenedor de ID
+
+Vimos como inyectar dependencias a través del constructor. Sin embargo, ahora tenemos un problema, el cuál es dónde construir nuestras dependencias (dónde hacer el **new**).
+
+1. A nuestro **BreedsController**, no le podemos pasar por parámetro la referencia a **IBreedsBusinessLogic**, ya que nunca llamamos al constructor del controller explícitamente. Esto lo hace Web API, en el momento en el que se rutea la request. Y nuestra WebAPI no sabe cómo se le pasa el IBreedsBusinessLogic. Es aquí entonces donde interviene el Web API Dependency Resolver (IDependencyResolver). Veremos esto en unos momentos.
+
+2. Capas inferiores, como la de BusinessLogic, son llamadas por capas superiores. Esto significa que el parámetro en la construcción tiene que venir por una capa superior. Y en ese caso, la capa superior se debe encargar de la instanciación, lo cual no es bueno. Por ejemplo: como BreedsController utiliza un IBreedsBusinessLogic, este debe crearlo. Sin embargo, a la hora de crearlo debe pasarle un repositorio, ya que la lógica de neogico precisa de el repositorio de acceso a datos para funcionar. Esto no es bueno ya que implicaría que el controller de la Web Api tenga que instanciar un repositorio, es decir, que la Web Api tenga una referencia a la forma de acceder a la base de datos. 
+
+**¿Cómo resolvemos entonces este problema? :sob:**
+
 
 
 
