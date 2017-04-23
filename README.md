@@ -9,7 +9,7 @@ Nuestra hoja de ruta consiste en ver:
 2) ¿Qué es inyectar una dependencia?
 3) Ventajas de la inyección de dependencias
 4) Problema de la construcción de dependencias: Unity como contenedor de ID
-5) Tutorial I: Unity en Web Api
+5) Tutorial I: Unity en la capa de la Web Api
 6) Tutorial II: Unity para el resto de nuestro sistema
 
 ## ¿Qué es una dependencia?
@@ -157,7 +157,7 @@ Ver más sobre el patrón aquí <https://msdn.microsoft.com/en-us/library/ff9210
 
 El framework que vamos a usar como contenedor se llama **Unity Application Block**.
 
-## Tutorial I: Unity en Web API
+## Tutorial I: Unity en la capa de la Web API
 
 ### 1. Instalar Unity
 
@@ -279,7 +279,167 @@ public static class WebApiConfig
 }
 ```
 
+**LISTO!** Ya se están inyectando nuestras dependencias de las clases de lógica de negocio en nuestros Controllers. 
 
+En el siguiente tutorial veremos cómo logramos que se inyecten el resto de las dependencias en otras capas de nuestra app.
+
+## Tutorial II: Unity para el resto de nuestro sistema
+
+Por ahora solo estamos inyectando nuestras clases de la lógica de negocio en nuestros controllers de Web Api. Lo que veremos aquí es cómo haremos para inyectar el resto de las dependencias. Para ello tenemos dos opciones:
+
+
+1) Inyectar las dependencias del mismo modo en que lo hicimos anteriormente. En la clase WebApiConfig.cs registraríamos otras dependencias, por ejemplo nuestros repositorios que son usados por nuestras clases de la lógica de negocio.
+2) Utilizar una capa que sea transversal a toda nuestra solución y que se encargue de crear las dependencias a partir de la lógica establecida para resolverlas.
+
+Seguiremos la segunda opción.
+
+### 1. Crearemos un nuevo proyecto Lupi.DependencyResolver
+
+Será el encargado de resolver las dependencias del resto de nuestros objetos. Será del tipo biblioteca de clases.
+
+### 2. Instalar Unity
+
+A tal proyecto le instalamos Unity como paquete de Nuget sobre el proyecto Lupi.Web.Api
+
+También podemos hacerlo a través de la Consola de Administrador de Paquetes:
+
+```console
+Install-Package Unity
+```
+
+### 3. Agregar referencia a System.ComponentModel.Composition
+
+Click derecho al proyecto -> Agregar -> Referencia -> Framework / Ensamblados -> System.ComponentModel.Composition;
+
+### 4. Agregamos nuestras interfaces: IComponentResolver e IComponent
+
+Agregaremos una interfaz llamada **IComponent** a nuestro proyecto DependencyResolver. Esta contendrá simplemente un método de inicialización llamado **Setup**. Esta interfaz ser implementada en nuestros proyectos, indicando la forma en que resolven las dependencias para cada proyecto. Por ejemplo tendremos un Resolver para BusinessLogic y otro para Repository. También modificaremos el ya existente de nuestra Web Api.
+
+IComponent:
+
+```C#
+
+namespace Lupi.DependencyResolver
+{
+    public interface IComponent
+    {
+        void SetUp(IRegisterComponent registerComponent);
+    }
+}
+
+```
+
+Esta interfaz depende de IRegisterComponent. Esta será quien funcione como contrato para registrar nuestros componentes.
+
+IRegisterComponent:
+
+```C#
+
+namespace Lupi.DependencyResolver
+{
+    public interface IRegisterComponent
+    {
+        void RegisterType<TFrom, TTo>(bool withInterception = false) where TTo : TFrom;
+        void RegisterTypeWithControlledLifeTime<TFrom, TTo>(bool withInterception = false) where TTo : TFrom;
+    }
+}
+```
+
+### 5. Agregamos la clase que se encargará de registrar los tipos en el contenedor: ComponentResolver
+
+Esta clase, llamémosla ComponentResolver, cargará tipos dinámicamente mediante Reflection. Aún no hemos visto este concepto, pero básicamente es una técnica para cargar ensamblados (y hacer cosas con ellos como instanciar objetos de sus clases), de forma dinámica, a través de llamadas a funciones. Esto evita tener que tener las dependencias hardcodeadas, aunque es más costoso porque se hace en tiempo de ejecución.
+
+Esta clase, ComponentResolver, lo que hará es cargar componentes desde un cierto contenedor, leyendo ensamblados por Reflection en una cierta ruta (path) especificada.
+
+ComponentResolver
+
+```C#
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.Composition.Hosting;
+using System.ComponentModel.Composition.Primitives;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using Microsoft.Practices.Unity;
+
+namespace Lupi.DependencyResolver
+{
+    public class ComponentLoader
+    {
+        public static void LoadContainer(IUnityContainer container, string path, string pattern)
+        {
+            var dirCat = new DirectoryCatalog(path, pattern);
+            var importDef = BuildImportDefinition();
+            try
+            {
+                using (var aggregateCatalog = new AggregateCatalog())
+                {
+                    aggregateCatalog.Catalogs.Add(dirCat);
+
+                    using (var componsitionContainer = new CompositionContainer(aggregateCatalog))
+                    {
+                        IEnumerable<Export> exports = componsitionContainer.GetExports(importDef);
+
+                        IEnumerable<IComponent> modules = exports.Select(export => export.Value as IComponent).Where(m => m != null);
+
+                        var registerComponent = new RegisterComponent(container);
+                        foreach (IComponent module in modules)
+                        {
+                            module.SetUp(registerComponent);
+                        }
+                    }
+                }
+            }
+            catch (ReflectionTypeLoadException typeLoadException)
+            {
+                var builder = new StringBuilder();
+                foreach (Exception loaderException in typeLoadException.LoaderExceptions)
+                {
+                    builder.AppendFormat("{0}\n", loaderException.Message);
+                }
+
+                throw new TypeLoadException(builder.ToString(), typeLoadException);
+            }
+        }
+
+        private static ImportDefinition BuildImportDefinition()
+        {
+            return new ImportDefinition(
+                def => true, typeof(IComponent).FullName, ImportCardinality.ZeroOrMore, false, false);
+        }
+    }
+
+    internal class RegisterComponent : IRegisterComponent
+    {
+        private readonly IUnityContainer _container;
+
+        public RegisterComponent(IUnityContainer container)
+        {
+            this._container = container;
+            //Register interception behaviour if any
+        }
+
+        public void RegisterType<TFrom, TTo>(bool withInterception = false) where TTo : TFrom
+        {
+            if (withInterception)
+            {
+                //register with interception
+            }
+            else
+            {
+                this._container.RegisterType<TFrom, TTo>();
+            }
+        }
+
+        public void RegisterTypeWithControlledLifeTime<TFrom, TTo>(bool withInterception = false) where TTo : TFrom
+        {
+            this._container.RegisterType<TFrom, TTo>(new ContainerControlledLifetimeManager());
+        }
+    }
+}
+```
 
 
 
