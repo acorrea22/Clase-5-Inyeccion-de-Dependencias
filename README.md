@@ -33,3 +33,49 @@ A nivel de código, esta puede ser una fórma válida de establecer una dependen
         }
    }
 ```
+
+## ¿Qué es inyectar una dependencia?
+
+Actualmente nuestro diseño para Lupi consiste en diferentes proyectos, cada uno representando una .dll diferente, donde las dependencias son algo así:
+
+##### Lupi.Web.Api ----> Lupi.BusinessLogic ----> Lupi.Repository ---> Lupi.DataAccess
+
+Si bien la estructura es correcta, ¿cómo están las responsabilidades a nivel de cada módulo? En un principio parece bien, pero analicemos nuevamente el la forma en que las capas se comunican:
+
+##### Web Api -> Business Logic
+
+
+```c#
+
+ public class BreedsController : ApiController
+ {
+        private IBreedsBusinessLogic breedsBusinessLogic { get; set; }
+
+        public BreedsController()
+        {
+            breedsBusinessLogic = new BreedsBusinessLogic();
+        }
+ }
+ ```
+ 
+##### Business Logic -> Repository
+ 
+ ```c#
+  public class BreedsBusinessLogic : IBreedsBusinessLogic
+  {
+        //Posible mejora de esta clase:
+        //Manejar un unico contexto para unificar las transacciones realizadas sobre Breeds a partir de una Unit Of Work
+
+        public BreedsRepository breedsRepository;
+
+        public BreedsBusinessLogic()
+        {
+            breedsRepository = new BreedsRepository();
+        }
+  }
+ ```
+
+
+
+
+
