@@ -9,7 +9,8 @@ Nuestra hoja de ruta consiste en ver:
 2) ¿Qué es inyectar una dependencia?
 3) Ventajas de la inyección de dependencias
 4) Problema de la construcción de dependencias: Unity como contenedor de ID
-5) Abstrayendo la lógica de la resolución de las dependencias ensamblado aparte
+5) Tutorial I: Unity en Web Api
+6) Tutorial II: Unity para el resto de nuestro sistema
 
 ## ¿Qué es una dependencia?
 
@@ -150,5 +151,136 @@ Pero en lugar de tener que hacer nuestra propia implementación **IDependencyRes
 
 El concepto de contenedores se basa en un patrón que se llama **Inversion of Control**, que consiste en que un framework particular sea el que llame a nuestra aplicación, y no nosotros manualmente. Un contenedor de IoC, como el que vamos a usar, construye los objetos por nosotros, invirtiendo el flujo "usual" de control. De ahí su nombre :stuck_out_tongue_winking_eye:.
 
-"IoC" stands for "inversion of control", which is a general pattern where a framework calls into application code. An IoC container constructs your objects for you, which "inverts" the usual flow of control.
-For this tutorial, we'll use Unity from Microsoft Patterns & Practices. (Other popular libraries include Castle Windsor, Spring.Net, Autofac, Ninject, and StructureMap.) You can use NuGet Package Manager to install Unity. From the Tools menu in Visual Studio, select Library Package Manager, then select Package Manager Console. In the Package Manager Console window, type the following command:
+
+Ver más sobre el patrón aquí <https://msdn.microsoft.com/en-us/library/ff921087.aspx?f=255&MSPPError=-2147217396>
+
+
+El framework que vamos a usar como contenedor se llama **Unity Application Block**.
+
+## Tutorial I: Unity en Web API
+
+### 1. Instalar Unity
+
+Instalamos Unity como paquete de Nuget sobre el proyecto Lupi.Web.Api
+
+También podemos hacerlo a través de la Consola de Administrador de Paquetes:
+
+```console
+
+Install-Package Unity
+
+```
+
+Vemos que se agregarán tres referencias:
+
+- Microsoft.Practices.Unity
+- Microsoft.Practices.Unity.Configuration
+- Microsoft.Practices.Unity.RegistrationByConvention
+
+### 2. Creamos nuestra implementación de IDependencyResolver
+
+En nuestro proyecto de Lupi.Web.Api, creamos una clase UnityResolver, este será llamado por nuestra Web Api para resolver sus dependencias. Como vimos antes, implementará el contrato definido por IDependencyResolver. Definámosla de la sigueinte manera:
+
+```c#
+
+using Microsoft.Practices.Unity;
+using System;
+using System.Collections.Generic;
+using System.Web.Http.Dependencies;
+
+public class UnityResolver : IDependencyResolver
+{
+    protected IUnityContainer container;
+
+    public UnityResolver(IUnityContainer container)
+    {
+        if (container == null)
+        {
+            throw new ArgumentNullException("container");
+        }
+        this.container = container;
+    }
+
+    public object GetService(Type serviceType)
+    {
+        try
+        {
+            return container.Resolve(serviceType);
+        }
+        catch (ResolutionFailedException)
+        {
+            return null;
+        }
+    }
+
+    public IEnumerable<object> GetServices(Type serviceType)
+    {
+        try
+        {
+            return container.ResolveAll(serviceType);
+        }
+        catch (ResolutionFailedException)
+        {
+            return new List<object>();
+        }
+    }
+
+    public IDependencyScope BeginScope()
+    {
+        var child = container.CreateChildContainer();
+        return new UnityResolver(child);
+    }
+
+    public void Dispose()
+    {
+        container.Dispose();
+    }
+}
+
+```
+
+### 3. Configurando el Dependency Resolver para que sea usado por nuestra Web Api
+
+Lo que haremos es asignar el DependencyResolver nuestro en la Property 'DependencyResolver' del objeto HttpConfiguration global. Esto lo hacemos dentro del método Register en **WebApiConfig.cs**. Y lo que hacemos es agregar estas lí
+neas:
+
+```c#
+var container = new UnityContainer();
+container.RegisterType<IBreedsBusinessLogic, BreedsBusinessLogic>(new HierarchicalLifetimeManager());
+//Acá registraramos más tipos (interfaz-implementación)
+//container.RegisterType<IPetsBusinessLogic, PetsBusinessLogic>(new HierarchicalLifetimeManager());
+config.DependencyResolver = new UnityResolver(container);
+```
+
+Nuestra clase WebApiConfig.cs quedara algo así:
+
+```c#
+
+public static class WebApiConfig
+{
+    public static void Register(HttpConfiguration config)
+    {
+        // Configuración y servicios de API web
+        var container = new UnityContainer();
+        container.RegisterType<IBreedsBusinessLogic, BreedsBusinessLogic>(new HierarchicalLifetimeManager());
+        //Acá registraramos más tipos (interfaz-implementación)
+        //container.RegisterType<IPetsBusinessLogic, PetsBusinessLogic>(new HierarchicalLifetimeManager());
+        config.DependencyResolver = new UnityResolver(container);
+
+        // Rutas de API web
+        config.MapHttpAttributeRoutes();
+
+        config.Routes.MapHttpRoute(
+            name: "DefaultApi",
+            routeTemplate: "api/{controller}/{id}",
+            defaults: new { id = RouteParameter.Optional }
+        );
+    }
+}
+```
+
+
+
+
+
+
