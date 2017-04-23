@@ -66,7 +66,7 @@ Si bien la estructura es correcta, ¿cómo están las responsabilidades a nivel 
         //Posible mejora de esta clase:
         //Manejar un unico contexto para unificar las transacciones realizadas sobre Breeds a partir de una Unit Of Work
 
-        public BreedsRepository breedsRepository;
+        public IBreedsRepository breedsRepository;
 
         public BreedsBusinessLogic()
         {
@@ -74,6 +74,27 @@ Si bien la estructura es correcta, ¿cómo están las responsabilidades a nivel 
         }
   }
  ```
+ 
+ ##### ¿Notaron el problema (común entre ambas porciones de código) que existe? 
+ 
+ El problema reside en que ambas piezas de código tiene la responsabilidad de la instanciación de sus dependencias. Nuestras capas no deberían estar tan fuertemente acopladas y no deberíam ser tan dependientes entre sí. Si bien el acoplamiento es a nivel de interfaz (tenemos IBreedsBusinessLogic y IBreedsRepository), la tarea de creación/instanciación/"hacer el new" de los objetos debería ser asignada a alguien más. Nuestras capas no deberían preocuparse sobre la creación de sus dependencias.
+
+##### ¿Por qué? ¿Qué tiene esto de malo?
+
+1. Si queremos **reemplazar** por ejemplo nuestro BreedsBusinessLogic **por una implementación diferente**, deberamos modificar nuestro controller. Si queremos reemplazar nuestro BreedsRepository por otro, tenemos que modificar nuestra clase BreedsBusinessLogic.
+
+
+2. Si la BreedsBusinessLogic tiene sus propias dependencias, **debemos configurarlas dentro del controller**. Para un proyecto grande con muchos controllers, el código de configuración empieza a esparcirse a lo largo de toda la solución.
+
+
+3. **Es muy difícil de testear, ya que las dependencias 'estan hardcodeadas'.** Nuestro controller siempre llama a la misma lógica de negocio, y nuestra lógica de negocio siempre llama al mismo repositorio para interactuar con la base de datos. En una prueba unitaria, se necesitaría realizar un mock/stub las clases dependientes, para evitar probar las dependencias. Por ejemplo: si queremos probar la lógica de BreedsBusinessLogic sin tener que depender de la lógica de la base de datos, podemos hacer un mock de BreedsRepository. Sin embargo, con nuestro diseño actual, al estar las dependencias 'hardcodeadas', esto no es posible.
+
+Una forma de resolver esto es a partir de lo que se llama, **Inyeccion de Dependencias**.
+
+
+
+We’ll assign this role to a third party that will be called our container. Fortunately Unity provides that help to us, to get rid of this dependency problem and invert the control flow by injecting dependency not by creating objects by new but through constructors or properties. There are other methods too, but I am not going into detail.
+
 
 
 
