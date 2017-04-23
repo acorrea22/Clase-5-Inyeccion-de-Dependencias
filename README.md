@@ -107,7 +107,7 @@ Esto lo haremos a partir de un parámetro en el constructor, o de un setter. Por
 Esto es fácil lograrlo usando interfaces o clases abstractas en C#.Siempre que una clase satisfaga la interfaz,voy a poder sustituirla e inyectarla.
 
 
-## Ventajas de ID
+## Ventajas de ID :bomb:
 
 Logramos resolver lo que antes habíamos descrito como desventajas o problemas :grin: :thumbsup:.
 
@@ -127,7 +127,28 @@ Vimos como inyectar dependencias a través del constructor. Sin embargo, ahora t
 
 **¿Cómo resolvemos entonces este problema? :sob:**
 
+Como mencionamos anteriormente, Web API define la interfaz IDependencyResolver para resolver dependencias. 
 
+```c#
 
+public interface IDependencyResolver : IDependencyScope, IDisposable
+{
+    IDependencyScope BeginScope();
+}
 
+public interface IDependencyScope : IDisposable
+{
+    object GetService(Type serviceType);
+    IEnumerable<object> GetServices(Type serviceType);
+}
 
+```
+
+Cuando Web API crea un Controller, llama **IDependecyResolver.GetService**, pasando el tipo de controller. Esto nos da la posibilidad de implementar la interfaz para crear el controller, resolviendo las dependencias. Si el GetService retorna null, Web API busca el constructor sin parámetros de la clase Controller.
+
+Pero en lugar de tener que hacer nuestra propia implementación **IDependencyResolver**, lo que haremos será usar un Contenedor de Inyección de dependencias. Estos contenedores son componentes que se encargan de administrar nuestras dependencias. Simplemente funcionan **como un diccionario clave-valor**; donde **para cada Interfaz, existe asociada una Implementación que la resuelve**. Nosotros nos vamos a encargar de registrar los tipos en el contenedor, y luego usar tal contenedor para crear objetos. Muchos de estos contenedores son tan pro :sunglasses: que te permiten manejar el scope y el tiempo que queremos que estos vivan.
+
+El concepto de contenedores se basa en un patrón que se llama **Inversion of Control**, que consiste en que un framework particular sea el que llame a nuestra aplicación, y no nosotros manualmente. Un contenedor de IoC, como el que vamos a usar, construye los objetos por nosotros, invirtiendo el flujo "usual" de control. De ahí su nombre :stuck_out_tongue_winking_eye:.
+
+"IoC" stands for "inversion of control", which is a general pattern where a framework calls into application code. An IoC container constructs your objects for you, which "inverts" the usual flow of control.
+For this tutorial, we'll use Unity from Microsoft Patterns & Practices. (Other popular libraries include Castle Windsor, Spring.Net, Autofac, Ninject, and StructureMap.) You can use NuGet Package Manager to install Unity. From the Tools menu in Visual Studio, select Library Package Manager, then select Package Manager Console. In the Package Manager Console window, type the following command:
