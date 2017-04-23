@@ -8,14 +8,15 @@ using System.Threading.Tasks;
 
 namespace Lupi.Repository
 {
-    public class BreedsRepository
+    public class BreedsRepository : IBreedsRepository
     {
 
         public IEnumerable<Breed> GetAll()
         {
             using (var context = new LupiDbContext())
             {
-                return context.Breeds;
+                List<Breed> breeds = context.Breeds.ToList();
+                return breeds;
             }
         }
 

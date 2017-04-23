@@ -8,12 +8,17 @@ using System.Threading.Tasks;
 
 namespace Lupi.BusinessLogic
 {
-    public class BreedsBusinessLogic
+    public class BreedsBusinessLogic : IBreedsBusinessLogic
     {
         //Posible mejora de esta clase:
         //Manejar un unico contexto para unificar las transacciones realizadas sobre Breeds a partir de una Unit Of Work
 
-        public BreedsRepository breedsRepository;
+        public IBreedsRepository breedsRepository;
+
+        public BreedsBusinessLogic(IBreedsRepository breedsRepository)
+        {
+            this.breedsRepository = breedsRepository;
+        }
 
         public IEnumerable<Breed> GetAllBreeds()
         {

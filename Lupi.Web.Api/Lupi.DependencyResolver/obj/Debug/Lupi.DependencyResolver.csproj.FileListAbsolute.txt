@@ -1,0 +1,14 @@
+C:\Users\GabrielMac\Documents\Visual Studio 2015\Projects\Lupi.Web.Api\Lupi.DependencyResolver\bin\Debug\Lupi.DependencyResolver.dll
+C:\Users\GabrielMac\Documents\Visual Studio 2015\Projects\Lupi.Web.Api\Lupi.DependencyResolver\bin\Debug\Lupi.DependencyResolver.pdb
+C:\Users\GabrielMac\Documents\Visual Studio 2015\Projects\Lupi.Web.Api\Lupi.DependencyResolver\bin\Debug\Microsoft.Practices.ServiceLocation.dll
+C:\Users\GabrielMac\Documents\Visual Studio 2015\Projects\Lupi.Web.Api\Lupi.DependencyResolver\bin\Debug\Microsoft.Practices.Unity.Configuration.dll
+C:\Users\GabrielMac\Documents\Visual Studio 2015\Projects\Lupi.Web.Api\Lupi.DependencyResolver\bin\Debug\Microsoft.Practices.Unity.dll
+C:\Users\GabrielMac\Documents\Visual Studio 2015\Projects\Lupi.Web.Api\Lupi.DependencyResolver\bin\Debug\Microsoft.Practices.Unity.RegistrationByConvention.dll
+C:\Users\GabrielMac\Documents\Visual Studio 2015\Projects\Lupi.Web.Api\Lupi.DependencyResolver\bin\Debug\Microsoft.Practices.ServiceLocation.pdb
+C:\Users\GabrielMac\Documents\Visual Studio 2015\Projects\Lupi.Web.Api\Lupi.DependencyResolver\bin\Debug\Microsoft.Practices.ServiceLocation.xml
+C:\Users\GabrielMac\Documents\Visual Studio 2015\Projects\Lupi.Web.Api\Lupi.DependencyResolver\bin\Debug\Microsoft.Practices.Unity.xml
+C:\Users\GabrielMac\Documents\Visual Studio 2015\Projects\Lupi.Web.Api\Lupi.DependencyResolver\bin\Debug\Microsoft.Practices.Unity.Configuration.xml
+C:\Users\GabrielMac\Documents\Visual Studio 2015\Projects\Lupi.Web.Api\Lupi.DependencyResolver\bin\Debug\Microsoft.Practices.Unity.RegistrationByConvention.xml
+C:\Users\GabrielMac\Documents\Visual Studio 2015\Projects\Lupi.Web.Api\Lupi.DependencyResolver\obj\Debug\Lupi.DependencyResolver.csprojResolveAssemblyReference.cache
+C:\Users\GabrielMac\Documents\Visual Studio 2015\Projects\Lupi.Web.Api\Lupi.DependencyResolver\obj\Debug\Lupi.DependencyResolver.dll
+C:\Users\GabrielMac\Documents\Visual Studio 2015\Projects\Lupi.Web.Api\Lupi.DependencyResolver\obj\Debug\Lupi.DependencyResolver.pdb

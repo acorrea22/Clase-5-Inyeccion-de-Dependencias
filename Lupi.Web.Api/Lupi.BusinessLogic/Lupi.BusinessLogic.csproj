@@ -31,6 +31,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -41,12 +42,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BreedsBusinessLogic.cs" />
+    <Compile Include="DependencyResolver.cs" />
+    <Compile Include="IBreedsBusinessLogic.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lupi.Data.Entities\Lupi.Data.Entities.csproj">
       <Project>{EAAB5865-FB8E-49F9-9DE6-BF499C9F9F2D}</Project>
       <Name>Lupi.Data.Entities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lupi.DependencyResolver\Lupi.DependencyResolver.csproj">
+      <Project>{815e6c8c-68d7-4000-9d86-62164a6ba4a7}</Project>
+      <Name>Lupi.DependencyResolver</Name>
     </ProjectReference>
     <ProjectReference Include="..\Lupi.Repository\Lupi.Repository.csproj">
       <Project>{110201B1-7090-495B-9C65-87598B2B9234}</Project>

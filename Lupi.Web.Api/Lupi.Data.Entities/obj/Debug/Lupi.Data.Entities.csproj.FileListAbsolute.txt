@@ -1,0 +1,5 @@
+C:\Users\GabrielMac\Documents\Visual Studio 2015\Projects\Lupi.Web.Api\Lupi.Data.Entities\bin\Debug\Lupi.Data.Entities.dll
+C:\Users\GabrielMac\Documents\Visual Studio 2015\Projects\Lupi.Web.Api\Lupi.Data.Entities\bin\Debug\Lupi.Data.Entities.pdb
+C:\Users\GabrielMac\Documents\Visual Studio 2015\Projects\Lupi.Web.Api\Lupi.Data.Entities\obj\Debug\Lupi.Data.Entities.csprojResolveAssemblyReference.cache
+C:\Users\GabrielMac\Documents\Visual Studio 2015\Projects\Lupi.Web.Api\Lupi.Data.Entities\obj\Debug\Lupi.Data.Entities.dll
+C:\Users\GabrielMac\Documents\Visual Studio 2015\Projects\Lupi.Web.Api\Lupi.Data.Entities\obj\Debug\Lupi.Data.Entities.pdb

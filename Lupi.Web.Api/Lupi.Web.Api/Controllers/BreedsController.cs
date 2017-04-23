@@ -1,5 +1,6 @@
 ﻿using Lupi.BusinessLogic;
 using Lupi.Data.Entities;
+using Microsoft.Practices.Unity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,12 +13,11 @@ namespace Lupi.Web.Api.Controllers
 {
     public class BreedsController : ApiController
     {
+        private IBreedsBusinessLogic breedsBusinessLogic { get; set; }
 
-        private BreedsBusinessLogic breedsBusinessLogic;
-
-        public BreedsController()
+        public BreedsController(IBreedsBusinessLogic breedsLogic)
         {
-            breedsBusinessLogic = new BreedsBusinessLogic();
+            breedsBusinessLogic = breedsLogic;
         }
         
         // GET: api/Breeds

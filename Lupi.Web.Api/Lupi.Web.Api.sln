@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lupi.BusinessLogic", "Lupi.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lupi.Repository", "Lupi.Repository\Lupi.Repository.csproj", "{110201B1-7090-495B-9C65-87598B2B9234}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lupi.DependencyResolver", "Lupi.DependencyResolver\Lupi.DependencyResolver.csproj", "{815E6C8C-68D7-4000-9D86-62164A6BA4A7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{110201B1-7090-495B-9C65-87598B2B9234}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{110201B1-7090-495B-9C65-87598B2B9234}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{110201B1-7090-495B-9C65-87598B2B9234}.Release|Any CPU.Build.0 = Release|Any CPU
+		{815E6C8C-68D7-4000-9D86-62164A6BA4A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{815E6C8C-68D7-4000-9D86-62164A6BA4A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{815E6C8C-68D7-4000-9D86-62164A6BA4A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{815E6C8C-68D7-4000-9D86-62164A6BA4A7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
