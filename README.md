@@ -470,9 +470,9 @@ namespace Lupi.BusinessLogic
 }
 ```
 
-Hemos implementado el metodo SetUp y en el mismo método utilizamos nuestro registerComponent para registrar los tipos que precisamos para ese ensamblado. Si qu
+Hemos implementado el metodo SetUp y en el mismo método utilizamos nuestro registerComponent para registrar los tipos que precisamos para ese ensamblado.  
 
-Para el resto de los proyectos es igual.
+Para el resto de los proyectos es igual, en el código de este repositorio se podrá apreciar lo mismo.
 
 ### 7. Cambiar el método Register para que dispare la lógica desde la Web.Api
 
@@ -491,7 +491,9 @@ namespace Lupi.Web.Api
 
             var container = new UnityContainer();
 
-            ComponentLoader.LoadContainer(container, ".\\bin", "Lupi.Web.*.dll");
+            ComponentLoader.LoadContainer(container, ".\\bin", "Lupi.*.dll");
+            
+            config.DependencyResolver = new UnityResolver(container);
 
             // Rutas de API web
             config.MapHttpAttributeRoutes();
@@ -505,3 +507,13 @@ namespace Lupi.Web.Api
     }
 }
 ```
+
+Lo que hace la línea ```c#     ComponentLoader.LoadContainer(container, ".\\bin", "Lupi.*.dll");``` es simplemente cargar las dependencias registradas por cada proyecto en su DependencyResolver (dentro del metodo SetUp). Esto lo hace cargando por Reflection los ensamblados que hay dentro de la carpeta **bin** y que se llaman  **Lupi.NOMBREDELENSAMBLADO.dll*
+
+### 8. Listo! Ya tenemos todo pronto. 
+
+Ahora siempre que queramos agregar una nueva dependencia deberemos registrarla dentro de la clase DependencyResolver, en cada proyecto. 
+
+Hemos logrado invertir el control y centralizar nuestras dependencias en un único lugar.
+
+
