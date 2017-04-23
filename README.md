@@ -11,5 +11,25 @@ Nuestra hoja de ruta consiste en ver:
 4) Problema de la construcción de dependencias: Unity como contenedor de ID
 5) Abstrayendo la lógica de la resolución de las dependencias ensamblado aparte
 
+## ¿Qué es una dependencia?
 
+En software, cuando hablamos de que dos piezas, componentes, librerías, módulos, clases, funciones (o lo que se nos pueda ocurrir relacionado al área), son dependientes entre sí, nos estamos refiriendo a que uno requiere del otro para funcionar. A nivel de clases, significa que una cierta **'Clase A'** tiene algún tipo de relación con una **'Clase B'**, delegándole el flujo de ejecución a la misma en cierta lógica.
 
+De forma más concreta, una clase que se encarga de resolver la lógica de negocio de las mascotas en LUPI, llamémosla **PetsBusinessLogic**, debe interactuar con alguna clase que le permita mediar con la base de datos, llamémosla **PetsRepository**. Cuando queramos agregar una nueva mascota, la lógica de negocio PetsBusinessLogic deberá delegar el flujo a PetsRepository, para agregarla en la BD.
+
+En consecuencia, **PetsBusinessLogic** *depende de* **PetsRepository**, o **PetsBusinessLogic** *--->* **PetsRepository**.
+
+A nivel de código, esta puede ser una fórma válida de establecer una dependencia:
+
+```c#
+
+  public class BreedsBusinessLogic
+  {
+        public BreedsRepository breedsRepository;
+
+        public BreedsBusinessLogic()
+        {
+            breedsRepository = new BreedsRepository();
+        }
+}
+```
