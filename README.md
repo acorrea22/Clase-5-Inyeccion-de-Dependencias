@@ -74,11 +74,11 @@ Si bien la estructura es correcta, ¿cómo están las responsabilidades a nivel 
   }
  ```
  
-** ¿Notaron el problema (común entre ambas porciones de código) que existe? **
+**¿Notaron el problema (común entre ambas porciones de código) que existe?**
  
  El problema reside en que ambas piezas de código tiene la responsabilidad de la instanciación de sus dependencias. Nuestras capas no deberían estar tan fuertemente acopladas y no deberíam ser tan dependientes entre sí. Si bien el acoplamiento es a nivel de interfaz (tenemos IBreedsBusinessLogic y IBreedsRepository), la tarea de creación/instanciación/"hacer el new" de los objetos debería ser asignada a alguien más. Nuestras capas no deberían preocuparse sobre la creación de sus dependencias.
 
-** ¿Por qué? ¿Qué tiene esto de malo? **
+**¿Por qué? ¿Qué tiene esto de malo?**
 
 1. Si queremos **reemplazar** por ejemplo nuestro BreedsBusinessLogic **por una implementación diferente**, deberamos modificar nuestro controller. Si queremos reemplazar nuestro BreedsRepository por otro, tenemos que modificar nuestra clase BreedsBusinessLogic.
 
