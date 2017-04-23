@@ -441,6 +441,67 @@ namespace Lupi.DependencyResolver
 }
 ```
 
+### 6. Compilar y agregar referencias desde el resto de los proyectos.
+
+Recordemos que este proyecto es una capa transversal que se encarga de tomar control para inyectar las dependencias. En consecuencia, todos los proyectos deberán apuntar a Lupi.DependencyResolver. Agregamos la referencia desde Lupi.Repository, Lupi.BusinessLogic y Lupi.Web.Api a Lupi.Dependency Resolver.
 
 
+### 7. Creamos un Resolver concreto para uno de los proyectos: Lupi.BusinessLogic
 
+Crearemos una clase concreta que implemente la interfaz **IComponent** que dijimos que ibamos a implementar en cada uno de nuestros proyectos.
+
+Le llamaremos DependencyResolver.
+
+
+```
+using Lupi.DependencyResolver;
+using System.ComponentModel.Composition;
+namespace Lupi.BusinessLogic
+{
+    [Export(typeof(IComponent))]
+    public class DependencyResolver : IComponent
+    {
+        public void SetUp(IRegisterComponent registerComponent)
+        {
+            registerComponent.RegisterType<IBreedsBusinessLogic, BreedsBusinessLogic>();
+            //Aca registraríamos otros tipos.
+        }
+    }
+}
+```
+
+Hemos implementado el metodo SetUp y en el mismo método utilizamos nuestro registerComponent para registrar los tipos que precisamos para ese ensamblado. Si qu
+
+Para el resto de los proyectos es igual.
+
+### 7. Cambiar el método Register para que dispare la lógica desde la Web.Api
+
+```
+using Lupi.DependencyResolver;
+using Microsoft.Practices.Unity;
+using System.Web.Http;
+
+namespace Lupi.Web.Api
+{
+    public static class WebApiConfig
+    {
+        public static void Register(HttpConfiguration config)
+        {
+            // Configuración y servicios de API web
+
+            var container = new UnityContainer();
+
+            ComponentLoader.LoadContainer(container, ".\\bin", "Lupi.Web.*.dll");
+
+            // Rutas de API web
+            config.MapHttpAttributeRoutes();
+
+            config.Routes.MapHttpRoute(
+                name: "DefaultApi",
+                routeTemplate: "api/{controller}/{id}",
+                defaults: new { id = RouteParameter.Optional }
+            );
+        }
+    }
+}
+```
